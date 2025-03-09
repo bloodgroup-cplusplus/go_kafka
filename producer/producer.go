@@ -6,11 +6,22 @@ import (
 	"log"
 
 	"github.com/IBM/sarama"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 type Comment struct {
 	Text string `form:"text" json:"text"`
+}
+
+
+func main() {
+
+	app := fiber.New()
+	api := app.Group("/api/v1")
+	api.Post("/comments",createComment)
+
+	app.Listen(":3000")
+
 }
 func createComment(c *fiber.Ctx) error {
 
@@ -42,20 +53,10 @@ func createComment(c *fiber.Ctx) error {
 
 }
 
-func main() {
-
-	app := fiber.New()
-	api := app.Group("/api/v1")
-	api.Post("/comments",createComment)
-
-	app.Listen(":3000")
-
-}
-
 func ConnectProducer(brokersUrl [] string) (sarama.SyncProducer,error) {
 
 	config := sarama.NewConfig()
-	config.Producer.Return.Success = true
+	config.Producer.Return.Successes = true
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Retry.Max = 5
 	conn, err := sarama.NewSyncProducer(brokersUrl,config)
@@ -80,7 +81,7 @@ func PushCommentToQueue(topic string,message [] byte) error {
 	if err !=nil {
 		return err
 	}
-	fmt.Printf("Message is stored in topic(%s)/partition(%d)\n",topic,partition,offset)
+	fmt.Printf("Message is stored in topic(%s)/partition(%d) and offset (%d)\n",topic,partition,offset)
 	return nil
 }
 
