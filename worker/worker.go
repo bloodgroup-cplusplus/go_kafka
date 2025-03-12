@@ -37,6 +37,7 @@ func main() {
 			}
 		case msg := <-consumer.Messages():
 			msgCount++
+			fmt.Printf("Received message count: %d: |Topic (%s) | Message (%s)\n",msgCount,string(msg.Topic),string(msg.Value))
 		}
 	}
 }
