@@ -32,6 +32,7 @@ func main() {
 	go func() {
 		for {
 			select {
+				// this is consuming data from the go channels
 			case err := <-consumer.Error():
 				fmt.Println(err)
 			}
