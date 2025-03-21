@@ -11,7 +11,7 @@ import (
 
 
 func main() {
-	// we will be running producer and worker on two different servers 
+	// we will be running producer and worker on two different servers
 
 	topic := "comments"
 	worker, err := connectConsumer([] string{"localhost:29092"})
@@ -32,13 +32,23 @@ func main() {
 	go func() {
 		for {
 			select {
-				// this is consuming data from the go channels
-			case err := <-consumer.Error():
+				case err := <-consumer.Error():
 				fmt.Println(err)
+
+				case msg := <-consumer.Messages():
+				msgCount++
+				fmt.Printf("Received message count : %d: | Topic (%s) | Message (%s)\n",msgCount,string,message)
+
+				case <-sigchan:
+				fmt.Println("Interruption detected")
+				doneCh <-struct {{}}
 			}
-		case msg := <-consumer.Messages():
-			msgCount++
-			fmt.Printf("Received message count: %d: |Topic (%s) | Message (%s)\n",msgCount,string(msg.Topic),string(msg.Value))
 		}
+	()
+	<-doneCh
+	fmt.Println("Processed",msgCount,"messages")
+	if err := worker.Cose(); err!=nil {
+		panic(err)
 	}
+
 }
